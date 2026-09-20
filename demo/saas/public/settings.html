@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdamCo Demo — Settings</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body data-auth-kind="anonymous">
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+      <h1>AdamCo Demo</h1>
+      <nav aria-label="Sections">
+        <a href="/index.html">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/tickets.html">Tickets</a>
+        <a href="/settings.html" aria-current="page">Settings</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/about.html">About</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <h2>Settings</h2>
+      <p class="muted">Workspace settings. The <code>?as=anonymous|
+      authenticated:&lt;p&gt;:&lt;s&gt;|administrator:&lt;p&gt;:&lt;s&gt;|
+      custom-role:&lt;r&gt;:&lt;p&gt;:&lt;s&gt;</code> query param selects the
+      auth context. The matching <code>data-condition="auth:&lt;kind&gt;"</code>
+      section is rendered; the others are hidden. The substrate stamps the
+      observed <code>&lt;html data-auth-kind&gt;</code> on every State it
+      materializes.</p>
+
+      <div role="group" aria-label="Auth context switcher" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3); flex-wrap: wrap;">
+        <a href="/settings.html?as=anonymous" data-auth-switch="anonymous">Anonymous</a>
+        <a href="/settings.html?as=authenticated:alice:session-1" data-auth-switch="authenticated">Authenticated (alice)</a>
+        <a href="/settings.html?as=administrator:bob:session-2" data-auth-switch="administrator">Administrator (bob)</a>
+        <a href="/settings.html?as=custom-role:billing-admin:carol:session-3" data-auth-switch="custom-role">Custom role (billing-admin)</a>
+      </div>
+
+      <!-- Anonymous: marketing CTAs only. -->
+      <section data-condition="auth:anonymous" class="card" style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 480px;">
+        <h3 style="margin-top: 0">Sign in to manage your workspace</h3>
+        <p>You are browsing as a guest. Sign in to view your profile, sessions, and API tokens.</p>
+        <div style="display: flex; gap: var(--space-2);">
+          <button class="primary">Sign in</button>
+          <button>Create account</button>
+        </div>
+      </section>
+
+      <!-- Authenticated: profile, sessions, API tokens. -->
+      <section data-condition="auth:authenticated" class="card" style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 480px;">
+        <h3 style="margin-top: 0">Profile</h3>
+        <label>Display name <input value="Harvey"></label>
+        <label>Email <input type="email" value="harvey@example.com"></label>
+        <h3>Active sessions</h3>
+        <ul>
+          <li>current session — desktop (2026-08-30 14:00)</li>
+        </ul>
+        <h3>API tokens</h3>
+        <p class="muted">No API tokens. Create one to call the AdamCo API from CI.</p>
+      </section>
+
+      <!-- Administrator: everything authenticated sees, plus users/audit/billing. -->
+      <section data-condition="auth:administrator" class="card" style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 480px;">
+        <h3 style="margin-top: 0">Workspace administration</h3>
+        <h4>Users</h4>
+        <p>Manage members and pending invites.</p>
+        <h4>Audit log</h4>
+        <p>Every administrative action is recorded.</p>
+        <h4>Billing</h4>
+        <p>View invoices, payment methods, and seat usage.</p>
+        <h3 style="margin-top: var(--space-3)">Danger zone</h3>
+        <p>Deleting a workspace is permanent. All projects, tickets, and history are erased.</p>
+        <button class="danger" id="btn-delete-workspace" command="show-modal" commandfor="delete-workspace-dialog">
+          Delete workspace
+        </button>
+      </section>
+
+      <!-- Custom role: only what billing-admin sees. -->
+      <section data-condition="auth:custom-role" class="card" style="display: flex; flex-direction: column; gap: var(--space-2); max-width: 480px;">
+        <h3 style="margin-top: 0">Billing (custom role: billing-admin)</h3>
+        <p>You have the <code>billing-admin</code> custom role. You can view
+        invoices and rotate the payment method, but you cannot manage users
+        or view the audit log.</p>
+        <h4>Invoices</h4>
+        <p class="muted">No invoices yet.</p>
+        <h4>Payment method</h4>
+        <p class="muted">No payment method on file.</p>
+      </section>
+
+      <dialog id="delete-workspace-dialog" aria-labelledby="delete-title">
+        <h2 id="delete-title">Delete this workspace?</h2>
+        <p>This is irreversible. Type the workspace name to confirm.</p>
+        <form method="dialog" style="display: flex; flex-direction: column; gap: var(--space-3);">
+          <label>Workspace name <input name="confirmText" required></label>
+          <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+            <button value="cancel">Cancel</button>
+            <button value="confirm" class="danger">Delete permanently</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

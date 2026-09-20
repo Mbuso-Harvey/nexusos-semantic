@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+# cosmos-managed: auto-refresh Cosmos live-read after merge.
+set -e
+COSMOS_PROJECT="$(git rev-parse --show-toplevel)"
+COSMOS_MANIFEST="$COSMOS_PROJECT/cosmos.environment.json"
+COSMOS_DB="$COSMOS_PROJECT/.cosmos/runtime.sqlite3"
+COSMOS_STATUS_DIR="$COSMOS_PROJECT/.cosmos"
+COSMOS_ROOT="C:/Users/Harvey/Cosmos"
+if [ ! -f "$COSMOS_MANIFEST" ]; then
+  exit 0
+fi
+mkdir -p "$COSMOS_STATUS_DIR" >/dev/null 2>&1 || true
+if command -v cosmos15 >/dev/null 2>&1; then
+  COSMOS15=cosmos15
+  COSMOS15_CD=""
+else
+  PY=$(command -v py || command -v python || command -v python3)
+  if [ -n "$PY" ] && [ -f "$COSMOS_ROOT/tools/cosmos15_operator.py" ]; then
+    COSMOS15="$PY -3.12 -m tools.cosmos15_operator"
+    COSMOS15_CD="cd \"$COSMOS_ROOT\" && export PYTHONPATH=\"$COSMOS_ROOT\""
+  else
+    printf '%s' '{"hook":"cosmos","status":"broken","reason":"no cosmos15 launcher and no Cosmos install"}' > "$COSMOS_STATUS_DIR/hook-status.json" 2>/dev/null || true
+    exit 0
+  fi
+fi
+if sh -c "$COSMOS15_CD && $COSMOS15 live-read \"$COSMOS_MANIFEST\" --db \"$COSMOS_DB\" >/dev/null 2>&1"; then
+  printf '%s' "{\"hook\":\"cosmos\",\"status\":\"ok\",\"at\":\"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"}" > "$COSMOS_STATUS_DIR/hook-status.json" 2>/dev/null || true
+else
+  printf '%s' '{"hook":"cosmos","status":"failed"}' > "$COSMOS_STATUS_DIR/hook-status.json" 2>/dev/null || true
+fi

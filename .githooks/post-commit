@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+# cosmos-managed: capture commit events into the runtime sqlite3.
+set -e
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+exec py -3.12 "C:/Users/Harvey/Cosmos/tools/cosmos_capture_hook.py" \
+  --repo "$PROJECT_ROOT" "$@"

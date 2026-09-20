@@ -1,0 +1,28 @@
+# Smithery MCP Server Specification for Agent Web Graph
+# https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    type: object
+    properties:
+      graph:
+        type: string
+        description: "Path to directory containing crawled graph.json"
+        default: "./crawl-output"
+      desktop:
+        type: boolean
+        description: "Enable Windows UI Automation direct desktop substrate"
+        default: false
+      mobile:
+        type: boolean
+        description: "Enable Android ADB mobile substrate"
+        default: false
+      noBidi:
+        type: boolean
+        description: "Run without attaching live WebDriver BiDi browser"
+        default: false
+  command: "node"
+  args:
+    - "dist/src/cli/awg.js"
+    - "serve"

@@ -1,0 +1,133 @@
+{
+  "slug": "aria-apg",
+  "name": "W3C ARIA Authoring Practices Guide (patterns index)",
+  "class": "permissioned-public",
+  "authoritative": false,
+  "target": {
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/",
+    "host": "www.w3.org"
+  },
+  "ranAt": "2026-09-17T16:04:19.480Z",
+  "verdict": "PASS",
+  "skipReason": null,
+  "error": null,
+  "checks": [
+    {
+      "field": "pagesTotal",
+      "expect": ">= 1",
+      "actual": 2,
+      "pass": true
+    },
+    {
+      "field": "axNodesTotal",
+      "expect": ">= 20",
+      "actual": 616,
+      "pass": true
+    },
+    {
+      "field": "statesTotal",
+      "expect": ">= 0",
+      "actual": 14,
+      "pass": true
+    },
+    {
+      "field": "edgesTotal",
+      "expect": ">= 0",
+      "actual": 10946,
+      "pass": true
+    },
+    {
+      "field": "healthScorePercent",
+      "expect": ">= 0",
+      "actual": 100,
+      "pass": true
+    },
+    {
+      "field": "extractorFailures",
+      "expect": "<= 0",
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "battery": [
+    {
+      "name": "pages",
+      "query": {
+        "select": "page"
+      },
+      "ok": true,
+      "hitCount": 2,
+      "error": null
+    },
+    {
+      "name": "links",
+      "query": {
+        "select": "ax-node",
+        "where": {
+          "role": "link"
+        }
+      },
+      "ok": true,
+      "hitCount": 50,
+      "error": null
+    },
+    {
+      "name": "buttons",
+      "query": {
+        "select": "ax-node",
+        "where": {
+          "role": "button"
+        }
+      },
+      "ok": true,
+      "hitCount": 3,
+      "error": null
+    },
+    {
+      "name": "states",
+      "query": {
+        "select": "state"
+      },
+      "ok": true,
+      "hitCount": 14,
+      "error": null
+    }
+  ],
+  "robots": {
+    "ok": true,
+    "url": "https://www.w3.org/robots.txt",
+    "status": 200,
+    "sha256": "f3947d244239d90298c7c3323a6d83042bb4f38c821f1bdefa449e7dfd9e2976",
+    "disallowAll": false
+  },
+  "imageDigest": null,
+  "summary": {
+    "healthScorePercent": 100,
+    "pagesTotal": 2,
+    "pagesLoaded": 2,
+    "pagesFailed": 0,
+    "pagesWithNoAxTree": 0,
+    "axNodesTotal": 616,
+    "capabilitiesTotal": 82,
+    "statesTotal": 14,
+    "edgesTotal": 10946
+  },
+  "diagnostics": {
+    "failedPages": [],
+    "pagesWithNoAxTree": [],
+    "extractorFailures": [],
+    "extractionWarnings": [],
+    "recommendations": [
+      "All systems healthy. Graph is complete and ready for agent reasoning."
+    ]
+  },
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32/x64",
+    "cli": "agent-web-graph@0.1.0",
+    "entry": "tsx src/cli/awg.ts",
+    "strict": false,
+    "bidiUrl": "ws://127.0.0.1:4444"
+  },
+  "runDir": "verification/runs/aria-apg/2026-09-17T16-04-19-477Z"
+}

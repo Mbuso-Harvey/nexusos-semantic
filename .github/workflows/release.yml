@@ -1,0 +1,68 @@
+name: Release Standalone Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-binaries:
+    name: Build Binary (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: awg-windows-x64.exe
+            src_path: dist/bin/awg.exe
+          - os: ubuntu-latest
+            artifact_name: awg-linux-x64
+            src_path: dist/bin/awg
+          - os: macos-latest
+            artifact_name: awg-macos-arm64
+            src_path: dist/bin/awg
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build TypeScript
+        run: pnpm build
+
+      - name: Compile Standalone SEA Binary
+        run: pnpm build:sea
+
+      - name: Prepare binary artifact (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          Copy-Item "${{ matrix.src_path }}" -Destination "${{ matrix.artifact_name }}"
+
+      - name: Prepare binary artifact (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          chmod +x ${{ matrix.src_path }}
+          cp ${{ matrix.src_path }} ${{ matrix.artifact_name }}
+
+      - name: Upload Binary to GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: ${{ matrix.artifact_name }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

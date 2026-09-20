@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdamCo Demo — About</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+      <h1>AdamCo Demo</h1>
+      <nav aria-label="Sections">
+        <a href="/index.html">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/tickets.html">Tickets</a>
+        <a href="/settings.html">Settings</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/about.html" aria-current="page">About</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <h2>About this demo</h2>
+      <p>
+        AdamCo is a synthetic SaaS application used as the <strong>standards-first</strong>
+        target for the Agent Web Graph crawler prototype. It is hand-built to expose:
+      </p>
+      <ul>
+        <li>HTML popover (user menu)</li>
+        <li><code>&lt;dialog&gt;</code> with <code>command="show-modal"</code> (sign out, new ticket, delete workspace)</li>
+        <li>Custom Invoker Commands (<code>command="--toggle-theme"</code>)</li>
+        <li>ARIA tabs (Recent / Popular / Archived)</li>
+        <li>ARIA combobox + listbox (docs search)</li>
+        <li>A sidecar <code>design-tokens.json</code> with a <code>tokens.json</code> reference</li>
+        <li>A sidecar <code>webmcp.json</code> declaring three capabilities across tiers</li>
+      </ul>
+      <p class="muted">
+        Every page in this demo is a <code>200 OK</code> anonymous response. The crawler
+        exercises the full five-layer extraction against this surface and writes the
+        result to a single Graph document.
+      </p>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

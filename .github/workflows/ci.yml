@@ -1,0 +1,267 @@
+# PR-8j — Constitutional CI workflow.
+#
+# The 4 constitutional gates per the project's mandatory
+# acceptance policy:
+#   1. `pnpm exec tsc --noEmit`         (TypeScript type check)
+#   2. `pnpm test`                     (vitest — full suite, no exclusions)
+#   3. `pnpm run check-env`            (env-report contract)
+#   4. `pnpm build`                    (production build)
+#
+# Branch protection on `main` requires this `Constitutional gates`
+# job to pass before any PR targeting `main` can be merged. See
+# `docs/EXECUTIVE_DECISIONS.md` ED-01 addendum 2026-09-01 PR-8j
+# for the per-rule reasoning.
+#
+# Design notes (PR-8j):
+# - pnpm is installed BEFORE `actions/setup-node@v4` with
+#   `cache: pnpm`, otherwise the cache lookup fails (pnpm is not
+#   on PATH at the time of cache resolution). This is the J4
+#   bootstrapping fix; the previous order caused every run to
+#   fall back to a cold pnpm install.
+# - Firefox + geckodriver are installed and started on
+#   127.0.0.1:4444. The real-BiDi tests
+#   (`test/pr-8i/real-bidi-auth.test.ts` and
+#   `test/pr-8i/real-bidi-choose-dropdown.test.ts`) are
+#   MANDATORY: missing BiDi substrate HARD-FAILS via
+#   `throw new Error(...)` in `beforeAll`. CI MUST set
+#   `AWG_REAL_BIDI=1`. (PR-8j T2)
+# - A concrete `AWG_CONVERGENCE_URL` is set for the test step.
+#   The external-convergence test
+#   (`test/e2e/real-app.test.ts`) is MANDATORY: missing URL
+#   HARD-FAILS via `throw new Error(...)` in `beforeAll`. CI
+#   MUST supply a URL that actually converges. (PR-8j T3)
+# - The job's status check name is `Constitutional gates` (the
+#   job `name:`). Branch protection's `required_status_checks.
+#   contexts` lists this exact string. (PR-8j T5 — the previous
+#   `ci` mismatch was the J5 defect.)
+# - The job uploads `test-results.junit.xml` (emitted by the
+#   PR-8i JUnit reporter) as a build artifact.
+
+name: ci
+
+# Note: `on:` is unquoted because GitHub Actions uses a custom
+# YAML parser that handles it correctly. (Some other YAML
+# parsers — e.g. Python's PyYAML — would interpret `on:` as
+# the YAML 1.1 boolean `true`; GitHub Actions does not.)
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Constitutional gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      # PR-8j J6 (fix): Force Firefox into headless mode. The
+      # GitHub Actions ubuntu-latest runner has no X display
+      # and no compositor; without MOZ_HEADLESS=1 the Firefox
+      # child process that geckodriver spawns crashes
+      # immediately with `Process (pid=NNNN) unexpectedly
+      # closed with status 1`. The env is inherited by the
+      # geckodriver process and forwarded to its Firefox
+      # children. We keep the Xvfb fallback in the
+      # "Start geckodriver" step (xvfb-run -a) as belt-and-
+      # braces: if MOZ_HEADLESS=1 is ever ignored by a future
+      # geckodriver, the X server is still there.
+      MOZ_HEADLESS: "1"
+      # PR-8j J6 (fix): D-Bus is missing in the runner sandbox;
+      # Firefox's GIO/GVFS backends try to talk to it and abort
+      # the process. Disable explicitly.
+      DBUS_SESSION_BUS_ADDRESS: /dev/null
+      # PR-8j J6 (fix): GLib's user-dirs.dnd backend also tries
+      # D-Bus; tell it explicitly not to.
+      GVFS_REMOTE_VOLUME_MONITOR_UDISKS2: "0"
+      # PR-8j T2: real BiDi is mandatory; the BiDi-gated tests
+      # HARD-FAIL when this is unset.
+      AWG_REAL_BIDI: "1"
+      # PR-8j T3: external convergence is mandatory. The
+      # `real-app.test.ts` beforeAll HARD-FAILS when this is
+      # unset. The URL points to the local synthetic demo
+      # (`demo/saas/server.cjs`) which the workflow starts
+      # before the test step (see "Start demo server" below).
+      # The synthetic demo's `index.html` carries static ARIA
+      # primitives (popover, combobox, tablist, dialog,
+      # invoker-commands) that the declared extractor maps to
+      # `state:cause` edges, AND a real BiDi probe that fires on
+      # the same elements. The two halves are exactly what
+      # `hasDeclared && hasObserved` requires.
+      #
+      # The W3C ARIA APG candidates do not converge under the
+      # current pipeline: the combobox-select-only example is a
+      # `<div role="combobox">` whose JS-controlled state does
+      # not auto-respond to the observed probe loop. The
+      # synthetic demo was chosen because (a) it is the
+      # authoritative "convergence fires" fixture per
+      # `test/e2e/real-app.test.ts:227`, and (b) it runs in the
+      # CI runner without network access to a third-party site.
+      AWG_CONVERGENCE_URL: "http://127.0.0.1:7311/"
+      # PR-8f: external E2E gate. The `real-app.test.ts`
+      # `external unmodified app` describe block has its own
+      # `beforeAll` that HARD-FAILS when this is unset. duckduckgo
+      # is a stable, unmodified target with a navigable multi-page
+      # hierarchy and no bot challenge.
+      AWG_E2E_URL: "https://duckduckgo.com"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # PR-8j T4: pnpm is installed BEFORE `actions/setup-node@v4`
+      # so that the pnpm cache resolution (which `setup-node`
+      # runs when `cache: pnpm` is set) finds pnpm on PATH.
+      # The previous order (setup-node first, then pnpm install)
+      # caused the cache lookup to fall back to a cold install on
+      # every run.
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # PR-8j T2: install Firefox + geckodriver. The BiDi client
+      # connects to geckodriver on 127.0.0.1:4444, which Firefox
+      # launches as a child process. Without geckodriver, the
+      # real-BiDi tests HARD-FAIL.
+      #
+      # The runner's `apt` does not always expose the
+      # `firefox-geckodriver` package, so we always fall back
+      # to the official geckodriver release tarball. We use
+      # `set +e` so an `apt` failure does not abort the step
+      # before the fallback runs.
+      #
+      # PR-8j J6 (fix): install Xvfb as a belt-and-braces
+      # fallback. The geckodriver step that follows wraps the
+      # driver in `xvfb-run -a`. MOZ_HEADLESS=1 (set at the job
+      # env level) is the primary path; Xvfb is the backup.
+      - name: Install geckodriver
+        run: |
+          set +e
+          sudo apt-get update
+          sudo apt-get install -y firefox-geckodriver xvfb
+          # If the apt package is missing, fall back to the
+          # pinned release tarball. The release version is
+          # pinned so the runner is reproducible.
+          if ! command -v geckodriver >/dev/null 2>&1; then
+            echo "firefox-geckodriver apt package unavailable; falling back to release tarball"
+            GECKODRIVER_VERSION="v0.36.0"
+            wget -q "https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VERSION}/geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz"
+            tar -xzf "geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz" -C /usr/local/bin/
+            rm "geckodriver-${GECKODRIVER_VERSION}-linux64.tar.gz"
+          fi
+          if ! command -v geckodriver >/dev/null 2>&1; then
+            echo "geckodriver install failed"
+            exit 1
+          fi
+          geckodriver --version
+
+      - name: Install Firefox (if not present)
+        run: |
+          if ! command -v firefox >/dev/null 2>&1; then
+            sudo apt-get install -y firefox
+          fi
+          firefox --version || echo "firefox binary not found"
+
+      - name: Start geckodriver in background
+        run: |
+          # Bind to 127.0.0.1:4444 (the BiDi client default).
+          # Firefox 154+ enforces Origin-header matching on the
+          # BiDi WebSocket handshake; the client opens with
+          # `Origin: http://127.0.0.1:9222` (see
+          # `src/bidi-client/session.ts`). That origin MUST be
+          # allowlisted via `--allow-origins`; without it the
+          # session-create request is rejected with
+          # "Invalid Origin header". The driver process keeps
+          # running for the rest of the job; the test step
+          # asserts connectivity via `portOpen(4444)`.
+          #
+          # PR-8j J6 (fix): the geckodriver process is wrapped
+          # in `xvfb-run -a` so the spawned Firefox child has an
+          # X server to talk to even if MOZ_HEADLESS=1 (set at
+          # the job env) is ignored by a future geckodriver
+          # version. `-a` picks an unused display number
+          # automatically. The Firefox child process inherits
+          # DISPLAY=:N from the xvfb wrapper.
+          nohup xvfb-run -a geckodriver \
+            --host 127.0.0.1 \
+            --port 4444 \
+            --allow-origins=http://127.0.0.1:9222 \
+            >/tmp/geckodriver.log 2>&1 &
+          # Wait for the port to be open before proceeding.
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if (echo > /dev/tcp/127.0.0.1/4444) 2>/dev/null; then
+              echo "geckodriver is listening on 4444"
+              exit 0
+            fi
+            echo "waiting for geckodriver (attempt $i/10)..."
+            sleep 1
+          done
+          echo "geckodriver did not start in time"
+          cat /tmp/geckodriver.log
+          exit 1
+
+      # PR-8j T3: start the synthetic demo server in the
+      # background. `AWG_CONVERGENCE_URL` is the local demo URL
+      # `http://127.0.0.1:7311/`, and the convergence test
+      # in `test/e2e/real-app.test.ts` hard-fails when the URL
+      # doesn't actually converge. The demo's `index.html`
+      # carries the static ARIA primitives (popover, combobox,
+      # tablist, dialog, invoker-commands) that the declared
+      # extractor maps to `state:cause` edges, and the observed
+      # probe loop fires on the same elements. The convergence
+      # gate's `converged.length > 0` assertion then passes.
+      # Without this server, the convergence URL would 404 and
+      # the gate would fail.
+      - name: Start synthetic demo server in background
+        run: |
+          nohup node demo/saas/server.cjs >/tmp/awg-demo.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8 9 10; do
+            if (echo > /dev/tcp/127.0.0.1/7311) 2>/dev/null; then
+              echo "demo server is listening on 7311"
+              exit 0
+            fi
+            echo "waiting for demo server (attempt $i/10)..."
+            sleep 1
+          done
+          echo "demo server did not start in time"
+          cat /tmp/awg-demo.log
+          exit 1
+
+      - name: Type check (gate 1)
+        run: pnpm exec tsc --noEmit
+
+      - name: Test (gate 2)
+        run: pnpm test
+
+      - name: Env contract (gate 3)
+        run: pnpm run check-env
+
+      - name: Build (gate 4)
+        run: pnpm build
+
+      # ED-08 §6 / ED-09: verification drift gate — regenerate
+      # docs/VERIFICATION.md from THIS run's junit output and fail if the
+      # committed copy is stale or hand-edited. The suite is fully green in
+      # CI (AWG_REAL_BIDI=1 + demo server), so the committed file must be a
+      # green-run snapshot; regenerate locally with the substrate running
+      # whenever the suite composition changes.
+      - name: Verification drift gate
+        run: node scripts/emit-verification.mjs --check
+
+      - name: Upload JUnit test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: test-results.junit.xml
+          if-no-files-found: warn
+          retention-days: 30

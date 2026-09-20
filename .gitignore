@@ -1,0 +1,63 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build
+dist/
+*.tsbuildinfo
+*.blob
+
+
+# test
+.vitest/
+coverage/
+# PR-8i T6: JUnit XML emitted by vitest (CI artifact, not source)
+test-results.junit.xml
+# audit scratch space (never committed)
+.tmp-audit*/
+
+# Evidence Ledger (ED-09 §3 / ED-10): per-run artifacts are machine-local; the
+# generated summary (verification/LEDGER.md), target manifests, and per-target
+# results (verification/results/*.json) ARE committed as evidence.
+verification/runs/
+
+# local operator tooling (machine-specific paths; never part of the product)
+/start_observatory.py
+
+# runtime
+*.log
+crawl.log
+env-report.json
+demo-crawl*/
+demo-crawl.json
+!demo/saas/public/
+
+# env
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# cosmos (internal agent tooling): world state and tooling config are machine-local and
+# NOT part of the open-source substrate — relocated to the machine-local internal archive
+# at the submission freeze. Never commit them, including the runtime state, hook status,
+# observatory stdout/stderr, per-edit .json.bak-* backups, and the root-level
+# payload.json / protection.json debug dumps of the GitHub API.
+/.cosmos/
+/cosmos.environment.json
+/_hook_smoke.md
+/payload.json
+/protection.json
+
+# internal PR process artifacts (machine-local build/test/audit logs; never part of the
+# open-source substrate — relocated to the machine-local internal archive)
+/docs/PR-*
+/docs/AUDIT-PR-*

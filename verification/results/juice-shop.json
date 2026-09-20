@@ -1,0 +1,29 @@
+{
+  "slug": "juice-shop",
+  "name": "OWASP Juice Shop (self-hosted container)",
+  "class": "self-hosted-oss",
+  "authoritative": true,
+  "target": {
+    "url": "http://127.0.0.1:3000/",
+    "host": "127.0.0.1"
+  },
+  "ranAt": "2026-09-17T16:07:31.128Z",
+  "verdict": "FAIL",
+  "skipReason": null,
+  "error": "awg inspect --fail-on-diagnostics failed: [awg] --fail-on-diagnostics: 1 page(s) produced no accessibility tree",
+  "checks": [],
+  "battery": null,
+  "robots": null,
+  "imageDigest": "sha256:73c53fbf442e8337b3ea3d98c7e8550308854701ebdfce4cc39768f36b75430e",
+  "summary": null,
+  "diagnostics": null,
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32/x64",
+    "cli": "agent-web-graph@0.1.0",
+    "entry": "tsx src/cli/awg.ts",
+    "strict": false,
+    "bidiUrl": "ws://127.0.0.1:4444"
+  },
+  "runDir": "verification/runs/juice-shop/2026-09-17T16-07-31-127Z"
+}

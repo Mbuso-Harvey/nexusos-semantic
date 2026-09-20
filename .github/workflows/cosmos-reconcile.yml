@@ -1,0 +1,135 @@
+# cosmos-reconcile — AC-019.
+#
+# Scheduled, design-system-triggered, and manually-dispatched
+# reconcile of the Cosmos 1.5 world inside this repository.
+#
+# Design notes (AC-019):
+#
+# - This workflow is intentionally separate from `ci.yml`. The
+#   Constitutional gates job (`name: ci`, job name `Constitutional
+#   gates`) is required by branch protection on `main`. Any
+#   failure here MUST NOT roll back the Constitutional gates
+#   status; therefore this workflow does not share a name, a
+#   trigger, or a required-check name with `ci.yml`.
+#
+# - Triggers: `workflow_dispatch` ONLY. The pinned Cosmos tooling
+#   checkout (`Mbuso-Harvey/Cosmos`, private sibling repo) cannot be
+#   provisioned by this repo's Actions runners without a dedicated
+#   token/marketplace setup, so push/PR/schedule triggers produced a
+#   guaranteed-red check on every qualifying commit. The workflow's
+#   own design principle ("flag, not enforce") made the automatic
+#   firing pure noise until the tooling repo is provisioned; it now
+#   runs on explicit manual dispatch only. See ED-11.
+#
+# - The job is strictly read-only against the repository: it
+#   validates the manifest and the on-disk graph against the
+#   Cosmos schema but never writes to `.cosmos/` or
+#   `cosmos.environment.json`. If validation fails the job
+#   exits non-zero; humans (or follow-up workflows) decide
+#   what to do. This preserves Cosmos's "flag, not enforce"
+#   principle.
+#
+# - Cosmos tooling is checked out into a sibling directory
+#   (`../Cosmos`) at the exact pinned SHA so the schema and
+#   operator definitions are reproducible. The pinned SHA is
+#   bumped by an explicit `Bump Cosmos SHA` PR when needed;
+#   it is NOT a floating ref.
+#
+# - `py -3.12` is used in operator paths because Cosmos 1.5
+#   is pinned to Python 3.12 (Python 3.14 has not been
+#   verified against Cosmos 1.5 yet). setup-python installs
+#   CPython 3.12.
+
+name: cosmos-reconcile
+
+"on":
+  # Manual dispatch only (ED-11) — the pinned private Cosmos tooling
+  # checkout cannot be provisioned by this repo's runners, so the
+  # automatic triggers produced a guaranteed-red check until
+  # provisioned. The workflow is intact; fire it from the Actions UI
+  # after the tooling repo is accessible.
+  workflow_dispatch:
+
+# Cancel any in-flight reconcile run for the same ref when a
+# new commit lands. Reconcile is idempotent so cancelling is
+# safe; this prevents queue backup during high-frequency
+# design-system edits.
+concurrency:
+  group: cosmos-reconcile-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  reconcile:
+    name: cosmos-reconcile
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # Pinned to Cosmos 1.6 HEAD on `durability/2026-09-04`
+      # (17c95ea) as of 2026-09-05. This SHA includes the
+      # cosmos15 doctor + start subcommands (Cosmos commit
+      # f40ce8c), the P2.02–P3.04 work, and the operator
+      # shape used by the agent-web-graph-side launch-plan.
+      # Bump via a dedicated PR — it is NOT a floating ref.
+      COSMOS_SHA: "17c95ea4c7568dd1c41a3c4342723204e8d6a72c"
+      # Operator and validate_ontology both import from
+      # `tools.*`; PYTHONPATH must include the Cosmos checkout.
+      PYTHONPATH: ${{ github.workspace }}/Cosmos
+    steps:
+      - name: Checkout agent-web-graph
+        uses: actions/checkout@v4
+        with:
+          # Full history is unnecessary and the projection
+          # only needs the working tree plus HEAD.
+          fetch-depth: 1
+          path: agent-web-graph
+
+      - name: Checkout Cosmos tooling (pinned SHA)
+        uses: actions/checkout@v4
+        with:
+          repository: Mbuso-Harvey/Cosmos
+          ref: ${{ env.COSMOS_SHA }}
+          path: Cosmos
+          fetch-depth: 1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Cosmos runtime deps
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install jsonschema==4.21.1
+
+      - name: Validate cosmos.environment.json
+        id: validate-manifest
+        shell: bash
+        working-directory: agent-web-graph
+        run: |
+          set -euo pipefail
+          python Cosmos/tools/cosmos15_operator.py validate cosmos.environment.json
+
+      - name: Summarize reconcile result
+        if: always()
+        shell: bash
+        working-directory: agent-web-graph
+        run: |
+          {
+            echo "## cosmos-reconcile summary"
+            echo ""
+            echo "- ref: \`${{ github.ref }}\`"
+            echo "- commit: \`${{ github.sha }}\`"
+            echo "- cosmos SHA: \`${{ env.COSMOS_SHA }}\`"
+            echo "- manifest validation: ${{ steps.validate-manifest.outcome }}"
+            echo ""
+            echo "### Files inspected"
+            echo ""
+            echo "- \`cosmos.environment.json\`"
+            echo "- \`.cosmos/graph.json\`"
+            echo ""
+            echo "### Next action"
+            echo ""
+            echo "If either step failed, this is a FLAG (not a merge block)."
+            echo "Reconcile does not modify the working tree."
+          } >> "$GITHUB_STEP_SUMMARY"

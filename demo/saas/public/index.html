@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdamCo Demo — Home</title>
+  <link rel="stylesheet" href="/app.css">
+  <script type="application/json" id="awg-design-tokens" src="/design-tokens.json"></script>
+  <script type="application/json" id="awg-webmcp" src="/webmcp.json"></script>
+</head>
+<body>
+  <div class="app-shell">
+
+    <aside class="sidebar" aria-label="Primary">
+      <h1>AdamCo Demo</h1>
+      <nav aria-label="Sections">
+        <a href="/index.html" aria-current="page">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/tickets.html">Tickets</a>
+        <a href="/settings.html">Settings</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/about.html">About</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <h2>Welcome to AdamCo</h2>
+
+        <!-- User menu: popover (HTML popover API, NOT dialog). -->
+        <button id="user-menu-button" popovertarget="user-menu" aria-haspopup="menu" aria-controls="user-menu">
+          User menu
+        </button>
+        <div id="user-menu" popover role="menu" aria-label="User menu">
+          <button role="menuitem" command="--navigate" commandfor="ax:nav-profile">Profile</button>
+          <button role="menuitem" command="--navigate" commandfor="ax:nav-billing">Billing</button>
+          <button role="menuitem" command="--show-modal" commandfor="confirm-signout">
+            Sign out
+          </button>
+        </div>
+      </header>
+
+      <p class="muted">A synthetic SaaS demo app used by the Agent Web Graph crawler. Every primitive on this page exists to be discovered by the extractors.</p>
+
+      <h3>Search docs</h3>
+      <p class="muted">Type at least two characters. Suggestions appear in the listbox.</p>
+      <div style="position: relative; max-width: 360px;">
+        <input
+          id="docs-search"
+          type="search"
+          role="combobox"
+          aria-label="Search docs"
+          aria-expanded="false"
+          aria-controls="docs-suggestions"
+          aria-autocomplete="list"
+          autocomplete="off"
+          placeholder="Search…">
+        <ul id="docs-suggestions" role="listbox" aria-label="Suggestions" hidden></ul>
+      </div>
+
+      <h3>Overview tabs</h3>
+      <div role="tablist" aria-label="Overview">
+        <button role="tab" id="tab-recent" aria-selected="true" aria-controls="panel-recent">Recent</button>
+        <button role="tab" id="tab-popular" aria-selected="false" aria-controls="panel-popular" tabindex="-1">Popular</button>
+        <button role="tab" id="tab-archived" aria-selected="false" aria-controls="panel-archived" tabindex="-1">Archived</button>
+      </div>
+      <div role="tabpanel" id="panel-recent" aria-labelledby="tab-recent">
+        <p>Recent activity appears here.</p>
+      </div>
+      <div role="tabpanel" id="panel-popular" aria-labelledby="tab-popular" hidden>
+        <p>Popular items appear here.</p>
+      </div>
+      <div role="tabpanel" id="panel-archived" aria-labelledby="tab-archived" hidden>
+        <p>Archived items appear here.</p>
+      </div>
+
+      <h3>Theme</h3>
+      <p>Custom Invoker Command <code>--toggle-theme</code> bound to the body via <code>commandfor="awg-theme-root"</code>.</p>
+      <button id="theme-toggle" command="--toggle-theme" commandfor="awg-theme-root">Toggle theme</button>
+      <span id="awg-theme-root" class="muted">Current theme: <span id="theme-label">light</span></span>
+
+      <h3>Sign out</h3>
+      <p>Standard Invoker Command <code>show-modal</code> bound to a <code>&lt;dialog&gt;</code>.</p>
+      <button command="show-modal" commandfor="confirm-signout">Sign out…</button>
+
+      <h3>Conditional rendering</h3>
+      <p class="muted">A feature-flagged block that appears only when
+      <code>?feature-x=on</code> is in the URL. The substrate's
+      "conditional" probe takes a snapshot of the page in each
+      flag state.</p>
+      <div data-condition="feature-x" id="feature-x-block" class="card" hidden>
+        <h4 style="margin-top: 0">Feature X (beta)</h4>
+        <p>This block is only visible when the URL has
+        <code>?feature-x=on</code>. Conditional rendering
+        exercises the substrate's auth/feature-flag state
+        capture.</p>
+        <button id="btn-toggle-feature-x">Hide Feature X</button>
+      </div>
+      <button id="btn-show-feature-x" command="--show-feature-x" commandfor="awg-feature-x-toggle">Show Feature X</button>
+      <span id="awg-feature-x-toggle" class="muted">Toggle target (no UI).</span>
+
+      <dialog id="confirm-signout" aria-labelledby="confirm-signout-title">
+        <h2 id="confirm-signout-title">Sign out?</h2>
+        <p>You'll need to sign in again to use AdamCo.</p>
+        <form method="dialog" style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+          <button value="cancel">Cancel</button>
+          <button value="confirm" class="danger" autofocus>Sign out</button>
+        </form>
+      </dialog>
+    </main>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{
+  "1-tabs": {
+    "assert": {
+      "present": [
+        { "tabName": "Code" },
+        { "tabName": "Issues" },
+        { "tabName": "Pull requests" },
+        { "tabName": "Discussions" },
+        { "tabName": "Actions" },
+        { "tabName": "Projects" },
+        { "tabName": "Security" },
+        { "tabName": "Insights" }
+      ]
+    }
+  },
+  "2-cta": {
+    "assert": {
+      "present": {
+        "name": "Sign up for GitHub",
+        "designTokenRefs": [
+          "color.btn.primary.bg"
+        ]
+      }
+    }
+  },
+  "3-capabilities": {
+    "assert": {
+      "present": [
+        { "name": "create_issue" },
+        { "name": "create_pull_request" }
+      ],
+      "_note": "GitHub repository capabilities matching /(create|update)/i regex."
+    }
+  },
+  "4-toggle-theme": {
+    "assert": {
+      "present": null,
+      "_note": "no live Page in the CLI eval path; task returns ok:false and the runner records task-failed."
+    }
+  },
+  "5-sticky": {
+    "assert": {
+      "present": [
+        {
+          "role": "navigation",
+          "name": "Global",
+          "designTokenRefs": [
+            "color.header.bg"
+          ]
+        }
+      ],
+      "_note": "GitHub sticky global header navbar."
+    }
+  }
+}

@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+# cosmos-managed: run continuous hygiene & certification checks before commit.
+set -e
+PROJECT_ROOT="$(git rev-parse --show-toplevel)"
+if command -v cosmos >/dev/null 2>&1; then
+  cosmos hygiene --root "$PROJECT_ROOT" >/dev/null 2>&1 || {
+    echo "[cosmos] Hygiene checks failed prior to commit. Run 'cosmos hygiene' for details." >&2
+    exit 1
+  }
+else
+  PY=$(command -v py || command -v python || command -v python3)
+  if [ -n "$PY" ]; then
+    "$PY" -m tools.cosmos_hygiene --root "$PROJECT_ROOT" >/dev/null 2>&1 || {
+      echo "[cosmos] Hygiene checks failed prior to commit. Run 'python -m tools.cosmos_hygiene' for details." >&2
+      exit 1
+    }
+  fi
+fi

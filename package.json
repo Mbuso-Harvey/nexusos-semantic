@@ -1,0 +1,78 @@
+{
+  "name": "agent-web-graph",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Universal kinetic & accessibility automation across Web, Mobile, and Desktop for AI agents. Substrates: BiDi, Windows UIA, macOS AX, Android ADB/UIAutomator2, iOS WDA.",
+  "license": "Apache-2.0",
+  "author": "NexusOS Systems",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mbuso-Harvey/nexusos-semantic.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Mbuso-Harvey/nexusos-semantic/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "agent",
+    "accessibility",
+    "aria",
+    "automation",
+    "kinetic",
+    "bidi",
+    "uia",
+    "adb"
+  ],
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "files": [
+    "dist",
+    "scripts",
+    "sea-config.json",
+    "smithery.yaml",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./desktop": "./dist/src/desktop/index.js",
+    "./mobile": "./dist/src/mobile/index.js",
+    "./substrate": "./dist/src/substrate/index.js",
+    "./server": "./dist/src/server/index.js"
+  },
+  "bin": {
+    "nexus": "dist/src/cli/awg.js",
+    "awg": "dist/src/cli/awg.js"
+  },
+  "scripts": {
+    "site": "node scripts/serve-site.cjs",
+    "check-env": "tsx scripts/check-env.ts",
+    "build": "tsc -p tsconfig.json && node -e \"const fs = require('fs'); fs.mkdirSync('dist/src/desktop/windows/scripts', {recursive: true}); fs.copyFileSync('src/desktop/windows/scripts/uia-bridge.ps1', 'dist/src/desktop/windows/scripts/uia-bridge.ps1'); fs.mkdirSync('dist/src/viewer', {recursive: true}); fs.copyFileSync('src/viewer/viewer.html', 'dist/src/viewer/viewer.html');\"",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify:emit": "node scripts/emit-verification.mjs",
+    "verify:ledger": "node scripts/run-ledger.mjs",
+    "mcp:smoke": "node scripts/mcp-smoke.mjs",
+    "build:sea": "tsx scripts/build-sea.ts",
+    "nexus": "tsx src/cli/awg.ts",
+    "awg": "tsx src/cli/awg.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/ws": "^8.18.1",
+    "esbuild": "^0.28.2",
+    "postject": "1.0.0-alpha.6",
+    "tsx": "^4.20.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "ws": "^8.18.0",
+    "zod": "^4.5.1"
+  }
+}
+

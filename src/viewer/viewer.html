@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>awg-viewer — Agent Web Graph trace viewer</title>
+<style>
+  :root {
+    --bg: #0f172a; --panel: #1e293b; --panel2: #0b1220;
+    --text: #e2e8f0; --muted: #94a3b8; --accent: #38bdf8;
+    --ok: #4ade80; --warn: #facc15; --bad: #f87171; --border: #334155;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 14px/1.5 ui-monospace, "Cascadia Mono", Consolas, monospace;
+         background: var(--bg); color: var(--text); }
+  header { padding: 14px 20px; background: var(--panel2); border-bottom: 1px solid var(--border); }
+  header h1 { margin: 0 0 4px; font-size: 16px; color: var(--accent); }
+  header .sub { color: var(--muted); font-size: 12px; word-break: break-all; }
+  nav.tabs { display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 20px; background: var(--panel); border-bottom: 1px solid var(--border); }
+  nav.tabs button { background: transparent; color: var(--muted); border: 1px solid transparent;
+    border-radius: 6px 6px 0 0; padding: 6px 12px; cursor: pointer; font: inherit; font-size: 13px; }
+  nav.tabs button.active { color: var(--accent); border-color: var(--border); border-bottom-color: var(--bg); background: var(--bg); }
+  main { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  section.tab { display: none; }
+  section.tab.active { display: block; }
+  h2 { font-size: 15px; color: var(--accent); margin: 24px 0 10px; }
+  h2:first-child { margin-top: 0; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--panel); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--panel2); color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 11px; }
+  tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 11px; border: 1px solid var(--border); color: var(--muted); }
+  .pill.ok { color: var(--ok); border-color: var(--ok); }
+  .pill.bad { color: var(--bad); border-color: var(--bad); }
+  .pill.acc { color: var(--accent); border-color: var(--accent); }
+  .muted { color: var(--muted); }
+  details { background: var(--panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 12px; margin-bottom: 8px; }
+  details summary { cursor: pointer; color: var(--text); font-weight: 600; }
+  details pre { overflow: auto; max-height: 320px; background: var(--panel2); padding: 10px; border-radius: 6px; font-size: 12px; }
+  input[type=search], select { background: var(--panel); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 10px; font: inherit; font-size: 13px; margin-bottom: 10px; }
+  .bar { background: var(--panel2); border: 1px solid var(--border); border-radius: 4px; height: 10px; overflow: hidden; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+  .bar-row { display: grid; grid-template-columns: 180px 1fr 60px; gap: 10px; align-items: center; margin-bottom: 6px; font-size: 12px; }
+  .rule { color: var(--muted); }
+  .state-succ { border-top: 1px dashed var(--border); margin-top: 6px; padding-top: 6px; font-size: 12px; color: var(--muted); }
+  .error { color: var(--bad); background: var(--panel); border: 1px solid var(--bad); border-radius: 8px; padding: 12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1 id="title">awg-viewer</h1>
+  <div class="sub" id="subtitle">loading…</div>
+</header>
+<nav class="tabs" id="tabs"></nav>
+<main id="main"></main>
+<script>
+"use strict";
+const $ = (id) => document.getElementById(id);
+const ESC = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({
+  "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+}[c]));
+
+const state = { doc: null, model: null, trace: null };
+const TABS = ["overview", "pages", "a11y", "states", "edges", "capabilities", "tokens", "trace"];
+
+const CAPTION = {
+  pages: "Pages", axNodes: "AX nodes", visualNodes: "Visual nodes",
+  navElements: "Nav elements", edges: "Edges", capabilities: "Capabilities",
+  transitions: "Transitions", states: "States", authContexts: "Auth contexts",
+  designTokens: "Design tokens",
+};
+
+async function boot() {
+  try {
+    const [g, s] = await Promise.all([
+      fetch("/graph.json").then(r => r.json()),
+      fetch("/summary.json").then(r => r.json()),
+    ]);
+    state.doc = g; state.model = s;
+    let t = null;
+    try { t = await fetch("/trace.json").then(r => (r.ok ? r.json() : null)); } catch {}
+    state.trace = t;
+    render();
+  } catch (e) {
+    $("title").textContent = "awg-viewer";
+    $("subtitle").textContent = "load failed — is this a crawl output dir (graph.json)?";
+    $("main").innerHTML = `<div class="error">${ESC(String((e && e.message) || e))}</div>`;
+  }
+}
+
+function render() {
+  const m = state.model;
+  $("title").textContent = "awg-viewer";
+  $("subtitle").textContent = `${m.crawl.rootUrl} · ${m.crawl.pages} pages · ${m.crawl.browser.engine} ${m.crawl.browser.version} · started ${m.crawl.startedAt}`;
+  $("tabs").innerHTML = TABS.map((t, i) =>
+    `<button data-tab="${t}" class="${i === 0 ? "active" : ""}">${cap(t)}</button>`).join("");
+  $("tabs").querySelectorAll("button").forEach(b =>
+    b.addEventListener("click", () => switchTab(b.dataset.tab)));
+  $("main").innerHTML = TABS.map((t, i) =>
+    `<section class="tab ${i === 0 ? "active" : ""}" id="tab-${t}"></section>`).join("");
+  renderOverview(); renderPages(); renderA11y(); renderStates();
+  renderEdges(); renderCaps(); renderTokens(); renderTrace();
+}
+
+function switchTab(name) {
+  document.querySelectorAll("#tabs button").forEach(b =>
+    b.classList.toggle("active", b.dataset.tab === name));
+  document.querySelectorAll("section.tab").forEach(s =>
+    s.classList.toggle("active", s.id === "tab-" + name));
+}
+
+function cap(s) { return s[0].toUpperCase() + s.slice(1); }
+
+function renderOverview() {
+  const m = state.model;
+  let bars = Object.entries(m.edgesByKind).sort((a, b) => b[1] - a[1]);
+  const max = bars.length ? bars[0][1] : 1;
+  $("tab-overview").innerHTML = `
+    <h2>Counts</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px">
+      ${Object.entries(m.counts).map(([k, v]) => `
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:8px;padding:12px">
+          <div style="font-size:22px;font-weight:700;color:var(--accent)">${v}</div>
+          <div style="color:var(--muted);font-size:12px">${CAPTION[k] ?? k}</div>
+        </div>`).join("")}
+    </div>
+    <h2>Edges by kind</h2>
+    <div>
+      ${bars.map(([k, v]) => `
+        <div class="bar-row">
+          <span>${ESC(k)}</span>
+          <div class="bar"><i style="width:${(v / max * 100).toFixed(1)}%"></i></div>
+          <span class="muted">${v}</span>
+        </div>`).join("") || "<p class='muted'>no edges</p>"}
+    </div>`;
+}
+function renderPages() {
+  const m = state.model;
+  if (!m.pages.length) { $("tab-pages").innerHTML = "<p class='muted'>no pages</p>"; return; }
+  $("tab-pages").innerHTML = `
+    <table>
+      <tr><th>Page</th><th>AX</th><th>Vis</th><th>Nav</th><th>States</th><th>Caps</th><th>Parent</th></tr>
+      ${m.pages.map(p => `
+        <tr>
+          <td><strong>${ESC(p.title || p.id)}</strong><br><span class="muted">${ESC(p.id)}</span></td>
+          <td>${p.axCount}</td><td>${p.visualCount}</td><td>${p.navElementCount}</td>
+          <td>${p.stateCount}</td><td>${p.capabilityCount}</td>
+          <td class="muted">${ESC(p.parentPageId ?? "—")}</td>
+        </tr>`).join("")}
+    </table>`;
+}
+
+function renderA11y() {
+  const doc = state.doc;
+  const byPage = {};
+  doc.axNodes.forEach(a => { (byPage[a.pageId] ??= []).push(a); });
+  let out = "";
+  for (const [pageId, axs] of Object.entries(byPage)) {
+    const childrenOf = {};
+    const roots = [];
+    for (const a of axs) {
+      const par = a.parentAxId;
+      if (par && byPage[a.pageId]?.some(x => x.id === par)) (childrenOf[par] ??= []).push(a);
+      else roots.push(a);
+    }
+    const nodeHtml = (c, d) => `
+      <details ${d === 0 ? "open" : ""} style="margin-left:${d * 18}px">
+        <summary>${ESC(c.role)} — ${ESC(c.name || "(unnamed)")} <span class="muted">${ESC(c.id)}</span></summary>
+        <p class="muted" style="margin:4px 0 0 0;font-size:12px">focusable=${c.focusable} · visibility=${c.visibility} · ${ESC(c.provenance)}</p>
+        ${(childrenOf[c.id] ?? []).map(ch => nodeHtml(ch, d + 1)).join("")}
+      </details>`;
+    out += `<h2>${ESC(pageId)} <span class="muted">(${axs.length} nodes)</span></h2>${roots.map(r => nodeHtml(r, 0)).join("")}`;
+  }
+  $("tab-a11y").innerHTML = out || "<p class='muted'>no ax nodes</p>";
+}
+
+function renderStates() {
+  const m = state.model;
+  if (!m.states.length) { $("tab-states").innerHTML = "<p class='muted'>no states</p>"; return; }
+  const byPage = {};
+  m.states.forEach(s => { (byPage[s.pageId] ??= []).push(s); });
+  const pageRows = Object.entries(byPage).map(([pageId, ss]) => `
+    <h3>${ESC(pageId)}</h3>
+    ${ss.map(s => `
+      <details>
+        <summary>${ESC(s.id.slice(0, 24))}… <span class="muted">· ${s.auth.kind}</span></summary>
+        <p class="muted" style="margin:4px 0">route: ${ESC(s.route)} · first observed ${s.firstObservedAt}</p>
+        <p>${s.evidenceKinds.map(k => `<span class="pill acc">${ESC(k)}</span>`).join(" ") || "<span class='muted'>no evidence</span>"}</p>
+        ${s.successors.length ? `<div class="state-succ"><strong>successors:</strong> ${s.successors.map(e =>
+          `${ESC(e.to.slice(0, 24))}… <span class="pill">${(e.triggers || []).join(", ") || "—"}</span>`).join("<br>")}</div>` : ""}
+      </details>`).join("")}`).join("");
+  $("tab-states").innerHTML = pageRows;
+}
+
+function renderEdges() {
+  const m = state.model;
+  if (!m.edges.length) { $("tab-edges").innerHTML = "<p class='muted'>no edges</p>"; return; }
+  const kinds = [...new Set(m.edges.map(e => e.kind))].sort();
+  $("tab-edges").innerHTML = `
+    <select id="edge-filter">
+      <option value="">all kinds</option>
+      ${kinds.map(k => `<option value="${ESC(k)}">${ESC(k)}</option>`).join("")}
+    </select>
+    <div id="edge-table"></div>`;
+  const draw = (kind) => {
+    const rows = kind ? m.edges.filter(e => e.kind === kind) : m.edges;
+    $("edge-table").innerHTML = `
+      <table>
+        <tr><th>Kind</th><th>From</th><th>→</th><th>To</th><th>Triggers</th><th>Provenance</th></tr>
+        ${rows.map(e => `
+          <tr>
+            <td><span class="pill">${ESC(e.kind)}</span></td>
+            <td class="muted">${ESC(e.from)}</td><td>→</td>
+            <td class="muted">${ESC(e.to)}</td>
+            <td class="muted">${(e.triggers || []).join(", ") || "—"}</td>
+            <td class="muted">${ESC(e.provenance)}</td>
+          </tr>`).join("")}
+      </table>`;
+  };
+  $("edge-filter").addEventListener("change", (ev) => draw(ev.target.value));
+  draw("");
+}
+
+function renderCaps() {
+  const doc = state.doc;
+  if (!doc.capabilities.length) { $("tab-capabilities").innerHTML = "<p class='muted'>no capabilities</p>"; return; }
+  const tier = (t) => t === "CONFIRM" || t === "EXECUTE" ? "acc" : "ok";
+  $("tab-capabilities").innerHTML = `
+    <table>
+      <tr><th>Name</th><th>Security</th><th>Page</th><th>Binding axId</th><th>Source</th></tr>
+      ${doc.capabilities.map(c => `
+        <tr>
+          <td><strong>${ESC(c.name)}</strong><br><span class="muted">${ESC(c.id)}</span></td>
+          <td><span class="pill ${tier(c.security)}">${ESC(c.security)}</span></td>
+          <td class="muted">${ESC(c.pageId)}</td>
+          <td class="muted">${ESC(c.binding.axId)}</td>
+          <td class="muted">${ESC(c.source)}</td>
+        </tr>`).join("")}
+    </table>`;
+}
+
+function countTokens(node, path = "", out = []) {
+  if (!node || typeof node !== "object") return out;
+  if ("$value" in node && "$type" in node) { out.push({ path, value: node.$value, type: node.$type }); return out; }
+  for (const [k, v] of Object.entries(node)) {
+    if (k.startsWith("$")) continue;
+    countTokens(v, path ? `${path}.${k}` : k, out);
+  }
+  return out;
+}
+
+function renderTokens() {
+  const doc = state.doc;
+  const toks = countTokens(doc.designTokens);
+  if (!toks.length) { $("tab-tokens").innerHTML = "<p class='muted'>no design tokens</p>"; return; }
+  $("tab-tokens").innerHTML = `
+    <table>
+      <tr><th>Path</th><th>Type</th><th>Value</th></tr>
+      ${toks.map(t => `<tr><td>${ESC(t.path)}</td><td class="muted">${ESC(t.type)}</td><td>${ESC(t.value)}</td></tr>`).join("")}
+    </table>`;
+}
+
+function renderTrace() {
+  const t = state.trace;
+  if (!t) { $("tab-trace").innerHTML = "<p class='muted'>no demo.trace.json in this output dir</p>"; return; }
+  const pillCls = (task) => task.skipped ? "muted" : task.pass ? "ok" : "bad";
+  const mark = (task) => task.skipped ? "SKIP" : task.pass ? "PASS" : "FAIL";
+  const budget = (task) => task.withinBudget ? "≤budget" : "OVER BUDGET";
+  $("tab-trace").innerHTML = `
+    <p class="muted">target: ${ESC(t.target)} · ${ESC(t.startedAt)} → ${ESC(t.finishedAt)} ·
+       passed ${t.summary.passed} · failed ${t.summary.failed} · skipped ${t.summary.skipped} · over-budget ${t.summary.overBudget}</p>
+    <table>
+      <tr><th>Task</th><th>Result</th><th>Duration</th><th>Budget</th><th>Output</th></tr>
+      ${t.tasks.map(task => `
+        <tr>
+          <td><strong>${ESC(task.id)}</strong></td>
+          <td><span class="pill ${pillCls(task)}">${mark(task)}</span></td>
+          <td>${task.durationMs.toFixed(1)}ms</td>
+          <td>${task.budgetMs}ms <span class="pill">${budget(task)}</span></td>
+          <td><details><summary>view</summary><pre>${ESC(JSON.stringify(task.output, null, 2))}</pre></details></td>
+        </tr>`).join("")}
+    </table>`;
+}
+
+boot();
+</script>
+</body>
+</html>

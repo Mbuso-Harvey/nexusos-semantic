@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdamCo Demo — Projects</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+      <h1>AdamCo Demo</h1>
+      <nav aria-label="Sections">
+        <a href="/index.html">Home</a>
+        <a href="/projects.html" aria-current="page">Projects</a>
+        <a href="/tickets.html">Tickets</a>
+        <a href="/settings.html">Settings</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/about.html">About</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <h2>Projects</h2>
+      <p class="muted">A list of demo projects. The <code>?filter=active|archived|all</code>
+      query param drives conditional rendering — the substrate treats each filter
+      view as a distinct route-driven state.</p>
+
+      <div role="group" aria-label="Filter" style="display: flex; gap: var(--space-2); margin-bottom: var(--space-3);">
+        <a href="/projects.html?filter=all" data-condition-filter="all">All</a>
+        <a href="/projects.html?filter=active" data-condition-filter="active">Active</a>
+        <a href="/projects.html?filter=archived" data-condition-filter="archived">Archived</a>
+      </div>
+
+      <ul id="project-list" aria-label="Projects" data-active-filter="all"
+          style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: var(--space-2);">
+        <li class="card" data-project-status="active">
+          <h3 style="margin-top: 0">apollo</h3>
+          <p class="muted">Internal tooling for the docs team.</p>
+          <a href="/projects/apollo.html" aria-label="Open project apollo">Open</a>
+        </li>
+        <li class="card" data-project-status="active">
+          <h3 style="margin-top: 0">borealis</h3>
+          <p class="muted">Customer-facing billing portal.</p>
+          <a href="/projects/borealis.html" aria-label="Open project borealis">Open</a>
+        </li>
+        <li class="card" data-project-status="archived">
+          <h3 style="margin-top: 0">cinder</h3>
+          <p class="muted">Background job runner. (Archived 2024-12.)</p>
+          <span class="muted" aria-label="Archived">Archived</span>
+        </li>
+      </ul>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

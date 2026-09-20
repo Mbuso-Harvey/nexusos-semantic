@@ -1,0 +1,36 @@
+{
+  "slug": "example-com",
+  "name": "example.com (IANA documentation domain)",
+  "class": "permissioned-public",
+  "authoritative": false,
+  "target": {
+    "url": "https://example.com/",
+    "host": "example.com"
+  },
+  "ranAt": "2026-09-17T16:06:34.014Z",
+  "verdict": "SKIP",
+  "skipReason": "robots.txt not retrievable (HTTP 404) — no authorization, no crawl",
+  "error": null,
+  "checks": [],
+  "battery": null,
+  "robots": {
+    "ok": false,
+    "url": "https://example.com/robots.txt",
+    "status": 404,
+    "sha256": null,
+    "disallowAll": false,
+    "error": "robots.txt not retrievable (HTTP 404)"
+  },
+  "imageDigest": null,
+  "summary": null,
+  "diagnostics": null,
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32/x64",
+    "cli": "agent-web-graph@0.1.0",
+    "entry": "tsx src/cli/awg.ts",
+    "strict": false,
+    "bidiUrl": "ws://127.0.0.1:4444"
+  },
+  "runDir": "verification/runs/example-com/2026-09-17T16-06-34-013Z"
+}

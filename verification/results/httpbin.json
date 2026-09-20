@@ -1,0 +1,127 @@
+{
+  "slug": "httpbin",
+  "name": "httpbin (self-hosted container)",
+  "class": "self-hosted-oss",
+  "authoritative": true,
+  "target": {
+    "url": "http://127.0.0.1:8099/",
+    "host": "127.0.0.1"
+  },
+  "ranAt": "2026-09-17T16:06:34.134Z",
+  "verdict": "PASS",
+  "skipReason": null,
+  "error": null,
+  "checks": [
+    {
+      "field": "pagesTotal",
+      "expect": ">= 1",
+      "actual": 2,
+      "pass": true
+    },
+    {
+      "field": "axNodesTotal",
+      "expect": ">= 4",
+      "actual": 120,
+      "pass": true
+    },
+    {
+      "field": "statesTotal",
+      "expect": ">= 0",
+      "actual": 8,
+      "pass": true
+    },
+    {
+      "field": "edgesTotal",
+      "expect": ">= 0",
+      "actual": 934,
+      "pass": true
+    },
+    {
+      "field": "healthScorePercent",
+      "expect": ">= 0",
+      "actual": 100,
+      "pass": true
+    },
+    {
+      "field": "extractorFailures",
+      "expect": "<= 0",
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "battery": [
+    {
+      "name": "pages",
+      "query": {
+        "select": "page"
+      },
+      "ok": true,
+      "hitCount": 2,
+      "error": null
+    },
+    {
+      "name": "links",
+      "query": {
+        "select": "ax-node",
+        "where": {
+          "role": "link"
+        }
+      },
+      "ok": true,
+      "hitCount": 5,
+      "error": null
+    },
+    {
+      "name": "buttons",
+      "query": {
+        "select": "ax-node",
+        "where": {
+          "role": "button"
+        }
+      },
+      "ok": true,
+      "hitCount": 1,
+      "error": null
+    },
+    {
+      "name": "states",
+      "query": {
+        "select": "state"
+      },
+      "ok": true,
+      "hitCount": 8,
+      "error": null
+    }
+  ],
+  "robots": null,
+  "imageDigest": "sha256:599fe5e5073102dbb0ee3dbb65f049dab44fa9fc251f6835c9990f8fb196a72b",
+  "summary": {
+    "healthScorePercent": 100,
+    "pagesTotal": 2,
+    "pagesLoaded": 2,
+    "pagesFailed": 0,
+    "pagesWithNoAxTree": 0,
+    "axNodesTotal": 120,
+    "capabilitiesTotal": 41,
+    "statesTotal": 8,
+    "edgesTotal": 934
+  },
+  "diagnostics": {
+    "failedPages": [],
+    "pagesWithNoAxTree": [],
+    "extractorFailures": [],
+    "extractionWarnings": [],
+    "recommendations": [
+      "All systems healthy. Graph is complete and ready for agent reasoning."
+    ]
+  },
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32/x64",
+    "cli": "agent-web-graph@0.1.0",
+    "entry": "tsx src/cli/awg.ts",
+    "strict": false,
+    "bidiUrl": "ws://127.0.0.1:4444"
+  },
+  "runDir": "verification/runs/httpbin/2026-09-17T16-06-34-133Z"
+}

@@ -1,0 +1,29 @@
+{
+  "slug": "example-com",
+  "name": "example.com (IANA documentation domain)",
+  "class": "permissioned-public",
+  "authoritative": false,
+  "authorizationBasis": "example.com is the IANA-reserved documentation domain (RFC 2606 / RFC 6761), published explicitly for use in examples and testing. Budget is hard-capped at 1 page per run by this manifest. robots.txt is fetched and snapshotted into the run directory before crawling as the authorization snapshot. EVIDENCE ONLY: this target never gates a release.",
+  "target": {
+    "url": "https://example.com/",
+    "host": "example.com"
+  },
+  "start": null,
+  "container": null,
+  "crawl": {
+    "maxPages": 1,
+    "posture": "autopilot",
+    "authorizeTargets": "example.com"
+  },
+  "expect": {
+    "minPages": 1,
+    "minAxNodes": 4,
+    "minStates": 0,
+    "minEdges": 0,
+    "healthScoreMin": 0,
+    "maxExtractorFailures": 0
+  },
+  "robots": {
+    "check": true
+  }
+}

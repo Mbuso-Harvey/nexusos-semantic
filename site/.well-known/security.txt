@@ -1,0 +1,11 @@
+# NexusOS Systems — coordinated vulnerability disclosure (RFC 9116).
+# Contact: see SECURITY.md in the repository for the full 3-tier model
+# (READ / EXECUTE / CONFIRM) and the reporting SLA (48h ack / 7d triage).
+Contact: mailto:security@nexusos-systems.org
+Expires: 2027-03-15T00:00:00.000Z
+Preferred-Languages: en
+# NOTE (ED-09 §8): the Canonical field is intentionally omitted until this
+# file is actually served at an HTTPS origin. Adding a Canonical URL that
+# 404s would violate the dead-URL prohibition (ED-08 §5). When the public
+# site goes live, publish this file at /.well-known/security.txt and add:
+#   Canonical: https://<final-site-origin>/.well-known/security.txt

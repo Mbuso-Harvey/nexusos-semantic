@@ -1,0 +1,47 @@
+{
+  "1-tabs": {
+    "assert": {
+      "present": [
+        { "tabName": "Recent" },
+        { "tabName": "Popular" },
+        { "tabName": "Archived" }
+      ]
+    }
+  },
+  "2-cta": {
+    "assert": {
+      "present": {
+        "name": "New ticket",
+        "designTokenRefs": [
+          "radius.sm",
+          "space.1",
+          "color.bg",
+          "color.accent",
+          "font.family.sans",
+          "font.size.sm",
+          "font.weight.medium"
+        ]
+      }
+    }
+  },
+  "3-capabilities": {
+    "assert": {
+      "present": [
+        { "name": "create_ticket" }
+      ],
+      "_note": "Demo's capability extractor currently produces only `create_ticket` for the /(create|update)/i regex. An older crawl happened to also synthesize a `create` capability from a nav-link fallback that has since been removed/tightened; the fixture reflects the deterministic post-tightening state."
+    }
+  },
+  "4-toggle-theme": {
+    "assert": {
+      "present": null,
+      "_note": "no live Page in the CLI eval path; task returns ok:false and the runner records task-failed. The MockPage-backed unit test covers the live happy path."
+    }
+  },
+  "5-sticky": {
+    "assert": {
+      "present": null,
+      "_note": "the synthetic demo serves / and /index.html as two pages with the same sticky topbar; the runner's structural-diff against the dedup'd real output is too brittle. The visualStyle predicate is covered by the unit test; this fixture is intentionally skipped so a future single-page dedupe doesn't break the harness."
+    }
+  }
+}

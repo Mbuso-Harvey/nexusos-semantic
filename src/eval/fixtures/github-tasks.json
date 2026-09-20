@@ -1,0 +1,32 @@
+{
+  "1-tabs": {
+    "assert": {
+      "present": null,
+      "_note": "github placeholder; populated after a real GitHub crawl in a later stage"
+    }
+  },
+  "2-cta": {
+    "assert": {
+      "present": null,
+      "_note": "github placeholder"
+    }
+  },
+  "3-capabilities": {
+    "assert": {
+      "present": null,
+      "_note": "github placeholder"
+    }
+  },
+  "4-toggle-theme": {
+    "assert": {
+      "present": null,
+      "_note": "github placeholder"
+    }
+  },
+  "5-sticky": {
+    "assert": {
+      "present": null,
+      "_note": "github placeholder"
+    }
+  }
+}

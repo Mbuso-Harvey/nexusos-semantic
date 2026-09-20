@@ -1,0 +1,29 @@
+{
+  "slug": "aria-apg",
+  "name": "W3C ARIA Authoring Practices Guide (patterns index)",
+  "class": "permissioned-public",
+  "authoritative": false,
+  "authorizationBasis": "Public W3C specification content, read-only, hard-capped at 2 pages per run against the canonical real-world ARIA reference. robots.txt is fetched and snapshotted per run. W3C site terms permit read-only access to published specification pages. EVIDENCE ONLY: this target never gates a release; it exists to prove the extractors handle real-world, non-synthetic ARIA markup (the exact surface design partners will ask about).",
+  "target": {
+    "url": "https://www.w3.org/WAI/ARIA/apg/patterns/",
+    "host": "www.w3.org"
+  },
+  "start": null,
+  "container": null,
+  "crawl": {
+    "maxPages": 2,
+    "posture": "autopilot",
+    "authorizeTargets": "www.w3.org"
+  },
+  "expect": {
+    "minPages": 1,
+    "minAxNodes": 20,
+    "minStates": 0,
+    "minEdges": 0,
+    "healthScoreMin": 0,
+    "maxExtractorFailures": 0
+  },
+  "robots": {
+    "check": true
+  }
+}

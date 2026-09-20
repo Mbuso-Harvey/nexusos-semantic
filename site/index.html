@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusOS Semantic — Universal Semantic Substrate for AI Agents</title>
+  <meta name="description" content="Stop clicking pixels. A persistent, deterministic semantic and accessibility graph across Web, Desktop, and Mobile for AI agents via Model Context Protocol (MCP). Maintained by NexusOS Systems.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="nav-brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-name">NexusOS Semantic</span>
+        <span class="brand-badge">MCP Native</span>
+      </div>
+      <nav class="nav-links">
+        <a href="#playground">Interactive Demo</a>
+        <a href="#substrates">Substrates</a>
+        <a href="#mcp-config">MCP Setup</a>
+        <a href="#cli">CLI & Binary</a>
+        <a href="https://github.com/nexusos-systems/nexusos-semantic" class="btn btn-sm btn-outline" target="_blank" rel="noopener">GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-pill">
+        <span class="pill-dot"></span>
+        <span>Universal Substrate: Web • Desktop • Mobile</span>
+      </div>
+      <h1 class="hero-title">
+        Stop Clicking Pixels.<br>
+        <span class="gradient-text">Give AI Agents Direct Semantic Control.</span>
+      </h1>
+      <p class="hero-subtitle">
+        Vision-based agents waste context taking screenshots and hallucinating click coordinates.
+        <strong>NexusOS Semantic</strong> exposes full accessibility trees, design tokens, interaction states,
+        and executable capabilities via standard <strong>Model Context Protocol (MCP)</strong>.
+      </p>
+
+      <div class="hero-actions">
+        <a href="#mcp-config" class="btn btn-primary">Add to Claude / Cursor</a>
+        <a href="#playground" class="btn btn-secondary">Try Live Playground</a>
+      </div>
+
+      <div class="hero-code-snippet">
+        <div class="snippet-header">
+          <span class="snippet-lang">Quickstart (No Install Required)</span>
+          <button class="copy-btn" id="hero-copy-btn">Copy</button>
+        </div>
+        <pre><code><span class="cmd">npx</span> -y nexusos-semantic doctor</code></pre>
+      </div>
+
+      <div class="hero-metrics">
+        <div class="metric-card">
+          <div class="metric-val">100x</div>
+          <div class="metric-lbl">Context Token Savings</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">0%</div>
+          <div class="metric-lbl">Coordinate Drift / Misses</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">3</div>
+          <div class="metric-lbl">Substrates: Web, Desktop, Mobile</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val">100%</div>
+          <div class="metric-lbl">Deterministic State Graph</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Live Interactive Playground Section -->
+  <section id="playground" class="section playground-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Interactive Graph Explorer</span>
+        <h2>Explore How Agents See the UI</h2>
+        <p>Select sample queries or click elements below to see real-time <code>AxTreeNode</code> extraction and MCP tool responses.</p>
+      </div>
+
+      <div class="playground-layout">
+        <!-- Visual UI simulator -->
+        <div class="playground-col ui-col">
+          <div class="card-header">
+            <span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span>
+            <span class="card-title">Rendered Interface (Human View)</span>
+          </div>
+          <div class="mock-app" id="mock-app">
+            <header class="mock-header">
+              <div class="mock-logo">⚡ AppFlow</div>
+              <div class="mock-nav">
+                <button class="mock-btn-link interactive-el" data-id="nav-dash" data-role="link" data-name="Dashboard">Dashboard</button>
+                <button class="mock-btn-link interactive-el" data-id="nav-tickets" data-role="link" data-name="Tickets">Tickets</button>
+                <button class="mock-btn-link interactive-el" data-id="nav-settings" data-role="link" data-name="Settings">Settings</button>
+              </div>
+            </header>
+            <main class="mock-body">
+              <div class="mock-card">
+                <div class="mock-card-header">
+                  <h3>Active Workspace</h3>
+                  <button class="mock-btn mock-btn-primary interactive-el" data-id="btn-create" data-role="button" data-name="Create Ticket">+ New Ticket</button>
+                </div>
+                <div class="mock-field">
+                  <label for="mock-search">Search Workspace:</label>
+                  <input type="text" id="mock-search" class="interactive-el" data-id="inp-search" data-role="searchbox" data-name="Search Workspace" placeholder="Search tasks, docs...">
+                </div>
+                <div class="mock-table">
+                  <div class="mock-row header">
+                    <span>Task</span><span>State</span><span>Action</span>
+                  </div>
+                  <div class="mock-row">
+                    <span>Fix BiDi reconnect timeout</span>
+                    <span class="badge open">OPEN</span>
+                    <button class="mock-btn mock-btn-sm interactive-el" data-id="btn-close-1" data-role="button" data-name="Resolve Task 1">Resolve</button>
+                  </div>
+                  <div class="mock-row">
+                    <span>Deploy SEA binary artifacts</span>
+                    <span class="badge in-progress">REVIEW</span>
+                    <button class="mock-btn mock-btn-sm interactive-el" data-id="btn-close-2" data-role="button" data-name="Approve Deployment">Approve</button>
+                  </div>
+                </div>
+              </div>
+            </main>
+          </div>
+          <div class="ui-hint">💡 Click any UI element above to highlight its semantic graph node.</div>
+        </div>
+
+        <!-- MCP Tool Query Controller -->
+        <div class="playground-col query-col">
+          <div class="card-header">
+            <span class="card-title">Agent MCP Query Console</span>
+            <div class="query-selector">
+              <select id="query-select">
+                <option value="buttons">graph_query (role: button)</option>
+                <option value="searchbox">graph_query (role: searchbox)</option>
+                <option value="capabilities">graph_tool (capabilities)</option>
+                <option value="path">graph_path (shortest-path)</option>
+              </select>
+              <button class="btn btn-xs btn-primary" id="run-query-btn">Execute</button>
+            </div>
+          </div>
+          <div class="query-input-box">
+            <div class="query-meta">Tool Invocation Payload:</div>
+            <pre><code id="query-payload-preview">{ "select": "ax-node", "where": { "role": "button" } }</code></pre>
+          </div>
+          <div class="query-result-box">
+            <div class="result-header">
+              <span>MCP Protocol Response:</span>
+              <span class="status-tag ok">200 OK</span>
+            </div>
+            <pre><code id="query-result-json">// Click "Execute" or any UI element to inspect the semantic graph response...</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Substrates Matrix -->
+  <section id="substrates" class="section substrates-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Cross-Platform Kinematics</span>
+        <h2>One Canonical Graph, Three Native Substrates</h2>
+        <p>No separate APIs for mobile, desktop, and web. All interfaces normalize to the same accessibility schema.</p>
+      </div>
+
+      <div class="substrates-grid">
+        <!-- Web Substrate -->
+        <div class="substrate-card">
+          <div class="sub-badge web">Web Substrate</div>
+          <h3>WebDriver BiDi & CDP</h3>
+          <p>Direct low-latency WebSocket communication with modern browser engines (Chromium & Firefox).</p>
+          <ul class="sub-features">
+            <li>Zero screenshot OCR latency</li>
+            <li>ARIA APG role & state inference</li>
+            <li>Dynamic state transitions (popover, modal, tablist)</li>
+            <li>Synthetic user dispatch (pointer, keyboard)</li>
+          </ul>
+          <div class="sub-code">
+            <code>awg crawl "https://example.com" --out ./graph</code>
+          </div>
+        </div>
+
+        <!-- Desktop Substrate -->
+        <div class="substrate-card featured">
+          <div class="sub-badge desktop">Desktop Substrate</div>
+          <h3>Windows UIA & macOS AX</h3>
+          <p>Inspect and interact with native desktop application windows through OS accessibility APIs.</p>
+          <ul class="sub-features">
+            <li>Native .NET UIAutomation PowerShell bridge</li>
+            <li>macOS AXUIElement integration</li>
+            <li>Focus management, hotkeys, native clicks</li>
+            <li>Scrape VS Code, Slack, ERPs without vision models</li>
+          </ul>
+          <div class="sub-code">
+            <code>awg desktop --scrape "Slack" --depth 3</code>
+          </div>
+        </div>
+
+        <!-- Mobile Substrate -->
+        <div class="substrate-card">
+          <div class="sub-badge mobile">Mobile Substrate</div>
+          <h3>Android ADB & iOS WDA</h3>
+          <p>Direct kinetic control over connected mobile devices, emulators, and test clouds.</p>
+          <ul class="sub-features">
+            <li>Direct ADB / UIAutomator2 XML parser</li>
+            <li>iOS WebDriverAgent / XCUITest client</li>
+            <li>Screen scraping into canonical AxTreeNode</li>
+            <li>Tap, swipe, gesture, and hardware keys</li>
+          </ul>
+          <div class="sub-code">
+            <code>awg mobile --scrape emulator-5554</code>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MCP Config Generator -->
+  <section id="mcp-config" class="section config-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">1-Click Integration</span>
+        <h2>Connect to Your Favorite AI Environment</h2>
+        <p>Full Model Context Protocol compatibility. Works out of the box with Claude Desktop, Cursor, Claude Code, and Zed.</p>
+      </div>
+
+      <div class="config-tabs-container">
+        <div class="config-tabs">
+          <button class="tab-btn active" data-tab="claude">Claude Desktop</button>
+          <button class="tab-btn" data-tab="cursor">Cursor IDE</button>
+          <button class="tab-btn" data-tab="claudecode">Claude Code CLI</button>
+          <button class="tab-btn" data-tab="smithery">Smithery CLI</button>
+          <button class="tab-btn" data-tab="sea">Standalone Binary</button>
+        </div>
+
+        <!-- Claude Desktop -->
+        <div class="tab-content active" id="tab-claude">
+          <div class="config-desc">
+            Add this configuration to your <code>claude_desktop_config.json</code>:
+          </div>
+          <div class="config-code-wrapper">
+            <button class="copy-code-btn" data-target="code-claude">Copy Config</button>
+            <pre><code id="code-claude">{
+  "mcpServers": {
+    "nexusos-semantic": {
+      "command": "npx",
+      "args": ["-y", "nexusos-semantic", "serve", "--desktop", "--mobile"]
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Cursor IDE -->
+        <div class="tab-content" id="tab-cursor">
+          <div class="config-desc">
+            Add to your project's <code>.cursor/mcp.json</code>:
+          </div>
+          <div class="config-code-wrapper">
+            <button class="copy-code-btn" data-target="code-cursor">Copy Config</button>
+            <pre><code id="code-cursor">{
+  "mcpServers": {
+    "nexusos-semantic": {
+      "command": "npx",
+      "args": ["-y", "nexusos-semantic", "serve"]
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- Claude Code CLI -->
+        <div class="tab-content" id="tab-claudecode">
+          <div class="config-desc">
+            Run this command directly in your terminal to register with Claude Code:
+          </div>
+          <div class="config-code-wrapper">
+            <button class="copy-code-btn" data-target="code-claudecode">Copy Command</button>
+            <pre><code id="code-claudecode">claude mcp add nexusos-semantic -- npx -y nexusos-semantic serve</code></pre>
+          </div>
+        </div>
+
+        <!-- Smithery CLI -->
+        <div class="tab-content" id="tab-smithery">
+          <div class="config-desc">
+            Install and run in 1-click via the Smithery MCP registry:
+          </div>
+          <div class="config-code-wrapper">
+            <button class="copy-code-btn" data-target="code-smithery">Copy Command</button>
+            <pre><code id="code-smithery">npx -y @smithery/cli run nexusos-semantic</code></pre>
+          </div>
+        </div>
+
+        <!-- Standalone Binary -->
+        <div class="tab-content" id="tab-sea">
+          <div class="config-desc">
+            No Node.js runtime required! Run the Single Executable Application (SEA) directly:
+          </div>
+          <div class="config-code-wrapper">
+            <button class="copy-code-btn" data-target="code-sea">Copy Config</button>
+            <pre><code id="code-sea">{
+  "mcpServers": {
+    "nexusos-semantic": {
+      "command": "nexus",
+      "args": ["serve"]
+    }
+  }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI Reference & Diagnostics -->
+  <section id="cli" class="section cli-section">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Built-in Diagnostics & Tooling</span>
+        <h2>Production Grade Reliability</h2>
+        <p>Run self-tests and inspect crawled application health with deterministic scoring.</p>
+      </div>
+
+      <div class="cli-grid">
+        <div class="cli-card">
+          <div class="cli-title"><code>nexus doctor</code></div>
+          <p>Inspects the local runtime, tests BiDi endpoints, verifies Windows UIA/macOS AX daemon access, probes Android ADB, and confirms storage durability.</p>
+          <pre><code>nexus doctor --json</code></pre>
+        </div>
+        <div class="cli-card">
+          <div class="cli-title"><code>nexus inspect</code></div>
+          <p>Calculates health percentage scores (0-100%) for web graphs, surfacing broken links, missing ARIA accessibility labels, and extractor failures.</p>
+          <pre><code>nexus inspect --graph ./my-crawl --diagnostics</code></pre>
+        </div>
+        <div class="cli-card">
+          <div class="cli-title"><code>nexus crawl</code></div>
+          <p>Autonomous crawler mapping state transitions, declared ARIA triggers, design tokens, and kinetic element bounding boxes.</p>
+          <pre><code>nexus crawl "http://localhost:3000" --out ./crawl-data</code></pre>
+        </div>
+        <div class="cli-card">
+          <div class="cli-title"><code>nexus serve</code></div>
+          <p>Starts the high-performance MCP stdio server providing semantic tools (<code>graph_query</code>, <code>graph_path</code>, <code>graph_tool</code>, <code>graph_invoke</code>).</p>
+          <pre><code>nexus serve --graph ./crawl-data --desktop --mobile</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-container">
+      <div class="footer-brand">
+        <span class="brand-icon">⚡</span>
+        <span class="brand-name">NexusOS Semantic</span>
+        <p class="footer-tagline">Open-source semantic & kinetic operating substrate for artificial intelligence.</p>
+      </div>
+      <div class="footer-meta">
+        <div class="footer-links">
+          <a href="https://github.com/nexusos-systems/nexusos-semantic" target="_blank" rel="noopener">GitHub Repository</a>
+          <a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">Model Context Protocol</a>
+          <a href="#playground">Playground</a>
+          <a href="#mcp-config">Installation</a>
+        </div>
+        <div class="footer-copy">
+          Released under the <strong>Apache License 2.0</strong>. Maintained by NexusOS Systems.
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

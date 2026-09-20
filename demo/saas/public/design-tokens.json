@@ -1,0 +1,60 @@
+{
+  "color": {
+    "bg": {
+      "$value": "#ffffff",
+      "$type": "color",
+      "$description": "page background"
+    },
+    "fg": {
+      "$value": "#1a1a1a",
+      "$type": "color"
+    },
+    "muted": {
+      "$value": "#6b7280",
+      "$type": "color"
+    },
+    "accent": {
+      "$value": "#3b82f6",
+      "$type": "color",
+      "$description": "primary CTA / link"
+    },
+    "danger": {
+      "$value": "#dc2626",
+      "$type": "color"
+    },
+    "border": {
+      "$value": "#e5e7eb",
+      "$type": "color"
+    }
+  },
+  "dimension": {
+    "radius": {
+      "sm": { "$value": "4px", "$type": "dimension" },
+      "md": { "$value": "8px", "$type": "dimension" },
+      "lg": { "$value": "16px", "$type": "dimension" }
+    },
+    "space": {
+      "1": { "$value": "4px", "$type": "dimension" },
+      "2": { "$value": "8px", "$type": "dimension" },
+      "3": { "$value": "12px", "$type": "dimension" },
+      "4": { "$value": "16px", "$type": "dimension" },
+      "6": { "$value": "24px", "$type": "dimension" }
+    }
+  },
+  "font": {
+    "family": {
+      "sans": { "$value": "system-ui, -apple-system, sans-serif", "$type": "fontFamily" }
+    },
+    "weight": {
+      "regular": { "$value": "400", "$type": "fontWeight" },
+      "medium":  { "$value": "500", "$type": "fontWeight" },
+      "bold":    { "$value": "700", "$type": "fontWeight" }
+    },
+    "size": {
+      "sm":   { "$value": "14px", "$type": "dimension" },
+      "md":   { "$value": "16px", "$type": "dimension" },
+      "lg":   { "$value": "20px", "$type": "dimension" },
+      "xl":   { "$value": "28px", "$type": "dimension" }
+    }
+  }
+}

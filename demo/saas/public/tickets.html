@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>AdamCo Demo — Tickets</title>
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary">
+      <h1>AdamCo Demo</h1>
+      <nav aria-label="Sections">
+        <a href="/index.html">Home</a>
+        <a href="/projects.html">Projects</a>
+        <a href="/tickets.html" aria-current="page">Tickets</a>
+        <a href="/settings.html">Settings</a>
+        <a href="/docs.html">Docs</a>
+        <a href="/about.html">About</a>
+      </nav>
+    </aside>
+    <main class="main">
+      <h2>Tickets</h2>
+      <p class="muted">Open tickets in this workspace.</p>
+
+      <div style="display: flex; gap: var(--space-2); margin-bottom: var(--space-4);">
+        <button class="primary" id="btn-new-ticket" command="show-modal" commandfor="new-ticket-dialog">New ticket</button>
+        <button>Filter</button>
+        <button>Export</button>
+      </div>
+
+      <table aria-label="Tickets" style="width: 100%; border-collapse: collapse;">
+        <thead>
+          <tr>
+            <th scope="col" style="text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--color-border);">ID</th>
+            <th scope="col" style="text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--color-border);">Title</th>
+            <th scope="col" style="text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--color-border);">Severity</th>
+            <th scope="col" style="text-align: left; padding: var(--space-2); border-bottom: 1px solid var(--color-border);">Status</th>
+          </tr>
+        </thead>
+        <tbody id="ticket-list">
+          <tr data-severity="high">
+            <td style="padding: var(--space-2);">AWG-101</td>
+            <td style="padding: var(--space-2);">Login loop on Safari</td>
+            <td style="padding: var(--space-2);">high</td>
+            <td style="padding: var(--space-2);">open</td>
+          </tr>
+          <tr data-severity="medium">
+            <td style="padding: var(--space-2);">AWG-102</td>
+            <td style="padding: var(--space-2);">Billing emails truncated on Outlook</td>
+            <td style="padding: var(--space-2);">medium</td>
+            <td style="padding: var(--space-2);">open</td>
+          </tr>
+          <tr data-severity="low">
+            <td style="padding: var(--space-2);">AWG-103</td>
+            <td style="padding: var(--space-2);">Add dark mode to the public docs</td>
+            <td style="padding: var(--space-2);">low</td>
+            <td style="padding: var(--space-2);">closed</td>
+          </tr>
+          <tr data-severity="low" draggable="true" id="draggable-ticket">
+            <td style="padding: var(--space-2);">AWG-104</td>
+            <td style="padding: var(--space-2);">Rearrange "Daily standup" row in the ticket board (drag me)</td>
+            <td style="padding: var(--space-2);">low</td>
+            <td style="padding: var(--space-2);">open</td>
+          </tr>
+          <!-- A long list of fillers so the page scrolls; the substrate's
+               scroll probe takes a snapshot after scrolling. -->
+          <tr><td colspan="4" style="padding: 0; height: 2400px;" aria-label="Long content for scroll probes"></td></tr>
+        </tbody>
+      </table>
+
+      <div style="display: flex; gap: var(--space-2); margin-top: var(--space-4);">
+        <button id="btn-load-more">Load more</button>
+        <span class="muted" id="load-more-hint">Click to fetch a stub payload (network/async state).</span>
+      </div>
+
+      <dialog id="new-ticket-dialog" aria-labelledby="new-ticket-title">
+        <h2 id="new-ticket-title">New ticket</h2>
+        <form method="dialog" id="new-ticket-form" style="display: flex; flex-direction: column; gap: var(--space-3); min-width: 320px;">
+          <label>Title <input name="title" required></label>
+          <label>Severity
+            <select name="severity" required>
+              <option value="low">low</option>
+              <option value="medium">medium</option>
+              <option value="high">high</option>
+            </select>
+          </label>
+          <label>Body <textarea name="body" rows="3" required></textarea></label>
+          <div style="display: flex; gap: var(--space-2); justify-content: flex-end;">
+            <button value="cancel">Cancel</button>
+            <button value="confirm" class="primary" autofocus>Create</button>
+          </div>
+        </form>
+      </dialog>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

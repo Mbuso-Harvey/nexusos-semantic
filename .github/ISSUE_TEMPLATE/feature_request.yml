@@ -1,0 +1,40 @@
+name: 💡 Feature Request
+description: Propose an idea, new substrate support, or MCP capability
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for proposing an enhancement to Agent Web Graph!
+  - type: dropdown
+    id: area
+    attributes:
+      label: Target Subsystem
+      options:
+        - Web Substrate (BiDi / CDP)
+        - Desktop Substrate (Windows UIA / macOS AX)
+        - Mobile Substrate (Android / iOS)
+        - MCP Server & Tools
+        - CLI Tooling & Diagnostics
+        - Single Executable Application (SEA)
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: Is your feature request related to a specific limitation or use case?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed enhancement or API design.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Considered Alternatives
+      description: Any alternative solutions or workarounds you have considered.
