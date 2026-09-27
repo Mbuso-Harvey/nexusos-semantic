@@ -4,19 +4,43 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
-| < 0.1.0 | :x:                |
+| 0.3.x   | :white_check_mark: |
+| < 0.3.0 | :x:                |
 
 ## Reporting a Vulnerability
 
 We take the security of NexusOS Semantic and kinetic agent automation seriously. If you identify a security vulnerability or exploit vector, please disclose it responsibly:
 
-1. **GitHub private vulnerability reporting (preferred).** The repository is
-   published; open a private vulnerability report via the Security tab so the
-   disclosure stays advisory-tracked.
-2. **Security Contact:** Email security alerts to `security@nexusos-systems.org`.
-3. **Response SLA:** The NexusOS Systems security team will acknowledge receipt within 48 hours and provide a patch or mitigation timeline within 7 days.
-4. **Public Disclosure:** Please refrain from publicly disclosing the issue until a patch has been merged and released.
+1. **Authoritative channel (LIVE) — GitHub private vulnerability reporting.**
+
+   **Security Contact:** `https://github.com/Mbuso-Harvey/nexusos-semantic/security/advisories/new`
+
+   Use the **Report a vulnerability** button on this repository's Security tab
+   (the form above). Your report stays private (advisory-tracked) and reaches
+   the maintainers of the published `agent-web-graph` package as well as this
+   repository.
+
+   *Live proof, 2026-09-27:* REST
+   `GET /repos/Mbuso-Harvey/nexusos-semantic/private-vulnerability-reporting`
+   returns `{"enabled":true}`, and this repository's `/security` page renders
+   the **Report a vulnerability** control linking to the URL above.
+
+2. **RETIRED channel — do not use email to `security@nexusos-systems.org`.**
+   That mailbox is **not operational**: as of 2026-09-27 the domain
+   `nexusos-systems.org` returns **NXDOMAIN** (no A, no MX — Google DoH,
+   Cloudflare DoH, 8.8.8.8, 1.1.1.1), so mail sent there is undeliverable. The
+   address is retained below only as a record of the retired channel. It becomes
+   valid again only if the domain is registered, an MX is published, and
+   `pnpm run wave2:verify-disclosure` in the `agent-web-graph` repository proves
+   it live.
+
+3. **Response SLA:** the maintainers will acknowledge receipt within 48 hours
+   and provide a patch or mitigation timeline within 7 days. The SLA is a
+   commitment, not a measured metric; no historical response-time measurement
+   has been recorded.
+
+4. **Public Disclosure:** please refrain from publicly disclosing the issue
+   until a patch has been merged and released.
 
 ---
 
